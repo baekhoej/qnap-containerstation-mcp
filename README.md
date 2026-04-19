@@ -1,0 +1,102 @@
+# QNAP Container Station MCP
+
+MCP server for managing containers on a QNAP NAS via the Container Station API.
+
+## Setup
+
+```bash
+npm install
+cp .env.example .env
+# Edit .env with your QNAP credentials
+npm run build
+```
+
+## Configuration
+
+Create a `.env` file (never commit this):
+
+```
+QNAP_URL=https://your-qnap.local
+QNAP_USERNAME=container-mcp
+QNAP_PASSWORD=your-password
+QNAP_VERIFY_SSL=false
+```
+
+`QNAP_VERIFY_SSL=false` is needed for self-signed certificates (default on most QNAP devices).
+
+## Claude Code
+
+Add to `.mcp.json` in your project root:
+
+```json
+{
+  "mcpServers": {
+    "qnap-container-station": {
+      "command": "node",
+      "args": ["/path/to/qnap-containerstation-mcp/dist/index.js"],
+      "env": {
+        "QNAP_URL": "https://your-qnap.local",
+        "QNAP_USERNAME": "container-mcp",
+        "QNAP_PASSWORD": "your-password",
+        "QNAP_VERIFY_SSL": "false"
+      }
+    }
+  }
+}
+```
+
+## Claude Desktop
+
+Add to `~/.config/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "qnap-container-station": {
+      "command": "node",
+      "args": ["/path/to/qnap-containerstation-mcp/dist/index.js"],
+      "env": {
+        "QNAP_URL": "https://your-qnap.local",
+        "QNAP_USERNAME": "container-mcp",
+        "QNAP_PASSWORD": "your-password",
+        "QNAP_VERIFY_SSL": "false"
+      }
+    }
+  }
+}
+```
+
+## Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `list_containers` | List all containers with state, image, type |
+| `get_container` | Get details for a specific container |
+| `get_container_logs` | Fetch logs for a Docker container |
+| `start_container` | Start a container |
+| `stop_container` | Stop a container |
+| `restart_container` | Restart a container |
+| `list_apps` | List Docker Compose applications |
+| `start_app` | Start a Compose app |
+| `stop_app` | Stop a Compose app |
+| `restart_app` | Restart a Compose app |
+| `get_system_resource` | Get CPU and memory usage |
+| `list_networks` | List Docker networks |
+| `get_logs` | Query Container Station system logs |
+
+> **Note:** Confirmed working on Container Station 3.x: `list_containers`, `list_apps`,
+> `start_container`, `stop_container`, `restart_container`. Other endpoints may return 404
+> depending on your Container Station version.
+
+## Tests
+
+```bash
+# Unit tests
+npm test
+
+# Live API tests (requires .env or env vars)
+npm run test:live
+
+# Override the test container (must be safe to stop/start)
+QNAP_TEST_CONTAINER_ID=<container-id> npm run test:live
+```

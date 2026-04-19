@@ -1,0 +1,25 @@
+{
+  "name": "qnap-containerstation-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for QNAP Container Station API",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "vitest run --exclude '**/*.live.test.ts'",
+    "test:live": "vitest run src/client.live.test.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "dotenv": "^16.0.0",
+    "tough-cookie": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/tough-cookie": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^4.0.0"
+  }
+}
