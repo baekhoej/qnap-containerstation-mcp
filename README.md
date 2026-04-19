@@ -2,6 +2,12 @@
 
 MCP server for managing containers on a QNAP NAS via the Container Station API.
 
+## Disclaimers
+
+This is a personal project, built for use on my own NAS. It is not affiliated with, endorsed by, or in any way connected to QNAP Systems, Inc. QNAP and Container Station are trademarks of their respective owners.
+
+This project is shared as-is. I make no claims about its suitability for any purpose other than my own use. Use it at your own risk.
+
 ## Setup
 
 ```bash
