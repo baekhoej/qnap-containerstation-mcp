@@ -2,6 +2,16 @@
   "name": "qnap-containerstation-mcp",
   "version": "0.1.0",
   "description": "MCP server for QNAP Container Station API",
+  "author": "Mikkel Baekhoej Christensen",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/baekhoej/qnap-containerstation-mcp.git"
+  },
+  "keywords": ["mcp", "qnap", "container-station", "docker", "containers"],
+  "engines": {
+    "node": ">=18"
+  },
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
