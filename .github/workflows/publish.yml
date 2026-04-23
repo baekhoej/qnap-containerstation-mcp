@@ -15,9 +15,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm test
       - run: npm run build
-      - run: cat "$NPM_CONFIG_USERCONFIG"
       - run: npm publish --access public
