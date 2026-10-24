@@ -19,6 +19,13 @@ vi.mock("./client.js", () => {
     getSystemResource: vi.fn(),
     listNetworks: vi.fn(),
     getLogs: vi.fn(),
+    listComposeApps: vi.fn(),
+    getComposeFile: vi.fn(),
+    validateCompose: vi.fn(),
+    createComposeApp: vi.fn(),
+    listImages: vi.fn(),
+    listVolumes: vi.fn(),
+    getOverview: vi.fn(),
     login: vi.fn(),
     logout: vi.fn(),
   };
@@ -143,5 +150,82 @@ describe("tool: get_logs", () => {
 
     await mock.getLogs({ limit: 5, level: "ERROR" });
     expect(mock.getLogs).toHaveBeenCalledWith({ limit: 5, level: "ERROR" });
+  });
+});
+
+describe("tool: list_compose_apps", () => {
+  it("returns compose app summaries", async () => {
+    const mock = await getMock();
+    mock.listComposeApps.mockResolvedValue([
+      { name: "monitoring", status: "running", type: "qnap", containers: 4, defaultURL: "", created: "2026-01-01" },
+    ]);
+
+    const result = await mock.listComposeApps();
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("monitoring");
+  });
+});
+
+describe("tool: get_compose_file", () => {
+  it("returns the compose YAML for an app", async () => {
+    const mock = await getMock();
+    mock.getComposeFile.mockResolvedValue("services:\n  prometheus:\n    image: prom/prometheus\n");
+
+    const result = await mock.getComposeFile("monitoring");
+    expect(mock.getComposeFile).toHaveBeenCalledWith("monitoring");
+    expect(result).toContain("prometheus");
+  });
+});
+
+describe("tool: validate_compose_file", () => {
+  it("reports a valid document", async () => {
+    const mock = await getMock();
+    mock.validateCompose.mockResolvedValue({ valid: true });
+    const res = await mock.validateCompose("services: {}");
+    expect(mock.validateCompose).toHaveBeenCalledWith("services: {}");
+    expect(res.valid).toBe(true);
+  });
+
+  it("reports an invalid document with the server message", async () => {
+    const mock = await getMock();
+    mock.validateCompose.mockResolvedValue({ valid: false, message: "yaml: line 2: bad" });
+    const res = await mock.validateCompose("bad");
+    expect(res.message).toMatch(/line 2/);
+  });
+});
+
+describe("tool: create_compose_app", () => {
+  it("creates an app from name and yml", async () => {
+    const mock = await getMock();
+    mock.createComposeApp.mockResolvedValue(undefined);
+    await mock.createComposeApp("myapp", "services: {}");
+    expect(mock.createComposeApp).toHaveBeenCalledWith("myapp", "services: {}");
+  });
+});
+
+describe("tool: list_images", () => {
+  it("returns images", async () => {
+    const mock = await getMock();
+    mock.listImages.mockResolvedValue([{ id: "sha256:abc", tags: ["nginx"] }]);
+    const res = await mock.listImages();
+    expect(res).toHaveLength(1);
+  });
+});
+
+describe("tool: list_volumes", () => {
+  it("returns volumes", async () => {
+    const mock = await getMock();
+    mock.listVolumes.mockResolvedValue([{ name: "gitea_data", driver: "local" }]);
+    const res = await mock.listVolumes();
+    expect(res[0].name).toBe("gitea_data");
+  });
+});
+
+describe("tool: get_overview", () => {
+  it("returns the overview object", async () => {
+    const mock = await getMock();
+    mock.getOverview.mockResolvedValue({ apps: [{ name: "gitea", status: "running" }] });
+    const res = await mock.getOverview();
+    expect(res.apps[0].name).toBe("gitea");
   });
 });

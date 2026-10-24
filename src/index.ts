@@ -127,6 +127,87 @@ server.tool(
 );
 
 server.tool(
+  "list_compose_apps",
+  "List Docker Compose applications with status and resource limits (v3 API, Container Station 3.1+)",
+  {},
+  async () => {
+    const apps = await client.listComposeApps();
+    return { content: [{ type: "text", text: JSON.stringify(apps, null, 2) }] };
+  }
+);
+
+server.tool(
+  "get_compose_file",
+  "Get the docker-compose YAML that Container Station uses for an application (v3 API, Container Station 3.1+)",
+  { name: z.string().describe("Application name") },
+  async ({ name }) => {
+    const yml = await client.getComposeFile(name);
+    return { content: [{ type: "text", text: yml }] };
+  }
+);
+
+server.tool(
+  "validate_compose_file",
+  "Validate a docker-compose YAML document against Container Station without creating anything (v3 API, Container Station 3.1+)",
+  { yml: z.string().min(1).describe("docker-compose YAML document") },
+  async ({ yml }) => {
+    const res = await client.validateCompose(yml);
+    const text = res.valid ? "Compose file is valid." : `Compose file is invalid: ${res.message}`;
+    return { content: [{ type: "text", text }] };
+  }
+);
+
+server.tool(
+  "create_compose_app",
+  "Create a Docker Compose application from a YAML document (v3 API, Container Station 3.1+). Fails if an app with this name already exists (it will not redeploy an existing app). The YAML is validated server-side. Bind-mount source paths must already exist on the NAS — Docker creates missing paths as root-owned empty directories.",
+  {
+    name: z.string().min(1).describe("Application name"),
+    yml: z.string().min(1).describe("docker-compose YAML document"),
+  },
+  async ({ name, yml }) => {
+    await client.createComposeApp(name, yml);
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Compose app ${name} accepted; deployment started. Check list_compose_apps for status (deployment is asynchronous).`,
+        },
+      ],
+    };
+  }
+);
+
+server.tool(
+  "list_images",
+  "List container images on the NAS (v3 API, Container Station 3.1+)",
+  {},
+  async () => {
+    const images = await client.listImages();
+    return { content: [{ type: "text", text: JSON.stringify(images, null, 2) }] };
+  }
+);
+
+server.tool(
+  "list_volumes",
+  "List container volumes on the NAS with usage (v3 API, Container Station 3.1+)",
+  {},
+  async () => {
+    const volumes = await client.listVolumes();
+    return { content: [{ type: "text", text: JSON.stringify(volumes, null, 2) }] };
+  }
+);
+
+server.tool(
+  "get_overview",
+  "Get a Container Station overview: apps and their status, container/image counts (v3 API, Container Station 3.1+)",
+  {},
+  async () => {
+    const overview = await client.getOverview();
+    return { content: [{ type: "text", text: JSON.stringify(overview, null, 2) }] };
+  }
+);
+
+server.tool(
   "get_system_resource",
   "Get current CPU and memory usage",
   {},
